@@ -114,9 +114,3 @@ export const reactionexport = async (id: any): Promise<any> => {
     // console.log("in api reaction",url,id)
     return await axios.post(url);
 }
-
-export const getSisterTenant = async (): Promise<any> => {
-    let url = baseAxiosUrl + "/companycommunicator/tenantlist";
-    // console.log("in api",url)
-    return await axios.get(url);
-}

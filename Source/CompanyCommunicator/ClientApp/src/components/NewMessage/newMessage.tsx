@@ -19,7 +19,7 @@ import { getInitAdaptiveCardPDFUpload, setCardTitlePDFUpload, setCardImageLinkPD
 import { getInitAdaptiveCardQuestionAnswer, setCardTitleQuestionAnswer, setCardAuthorQuestionAnswer, setCardPartQuestionAnswer } from '../AdaptiveCard/adaptiveCardQuestionAnswer';
 import { getInitAdaptiveCardEmailTemplate, setCardTitleEmailTemplate, setCardAuthorEmailTemplate, setCardFileNameEmailTemplate, setCardSummaryEmailTemplate } from '../AdaptiveCard/adaptiveCardEmailTemplate';
 
-import { getDraftNotification, getTeams, createDraftNotification, updateDraftNotification, searchGroups, getGroups, verifyGroupAccess, sendPdfFile, getSisterTenant } from '../../apis/messageListApi';
+import { getDraftNotification, getTeams, createDraftNotification, updateDraftNotification, searchGroups, getGroups, verifyGroupAccess, sendPdfFile } from '../../apis/messageListApi';
 
 import { getBaseUrl } from '../../configVariables';
 import { ImageUtil } from '../../utility/imageutility';
@@ -211,7 +211,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         document.addEventListener("keydown", this.escFunction, false);
         let params = this.props.match.params;
         this.setGroupAccess();
-        this.getSisterTenantId();
 
         this.getTeamList().then(() => {
 
@@ -391,15 +390,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         //fire the fileinput click event and run the handleImagePDFSelection function
         this.fileInput.current.click();
     };
-
-    private getSisterTenantId = async () => {
-        const response = await getSisterTenant();
-        // console.log("sister tenant id",response)
-        this.setState({
-            sistertenantId: response.data
-        })
-    }
-
 
     private makeDropdownItems = (items: any[] | undefined) => {
         const resultedTeams: dropdownItem[] = [];
@@ -1067,12 +1057,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                         )
                                                     },
                                                 },
-                                                (((this.state.templateType === this.localize("ImageUpload")) || (this.state.templateType === this.localize("PDFUpload"))) && {
-                                                    name: "sistertenant",
-                                                    key: "sistertenant",
-                                                    value: "sistertenant",
-                                                    label: this.localize("SendToSisterTenant"),
-                                                }),
                                             ]}
                                         >
                                         </RadioGroup>
@@ -1259,7 +1243,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
             teamsOptionSelected: data.value === 'teams',
             rostersOptionSelected: data.value === 'rosters',
             groupsOptionSelected: data.value === 'groups',
-            allUsersOptionSelected: data.value === 'allUsers' || data.value === "sistertenant",
+            allUsersOptionSelected: data.value === 'allUsers',
             sisterTenantOptionSelected: data.value === 'sistertenant',
             selectedTeams: data.value === 'teams' ? this.state.selectedTeams : [],
             selectedTeamsNum: data.value === 'teams' ? this.state.selectedTeamsNum : 0,
@@ -1474,8 +1458,8 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
             ScheduledDate: new Date(this.state.scheduledDate),
             Buttons: JSON.stringify(this.state.values),
             TemplateType: this.state.templateType,
-            SendTypeId: (this.state.selectedRadioBtn === "teams") ? "1" : (this.state.selectedRadioBtn === "rosters") ? "2" : (this.state.selectedRadioBtn === "allUsers") ? "3" : (this.state.selectedRadioBtn === "groups") ? "4" : "5",
-            TenantId: (this.state.selectedRadioBtn === "sistertenant") ? this.state.sistertenantId : this.state.tenantId,
+            SendTypeId: (this.state.selectedRadioBtn === "teams") ? "1" : (this.state.selectedRadioBtn === "rosters") ? "2" : (this.state.selectedRadioBtn === "allUsers") ? "3" :  "4",
+            TenantId: this.state.tenantId,
             EmailBody: "",
             EmailTitle: this.state.emailFileTitle,
             AdaptiveCardContent: JSON.stringify(this.card)
